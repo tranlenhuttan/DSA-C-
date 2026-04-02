@@ -1,0 +1,2 @@
+complete hashfunction 
+design parttern (strategy va singleton)
