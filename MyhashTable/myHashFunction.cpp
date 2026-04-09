@@ -52,16 +52,25 @@ class MyhashTable {
     void insertItem(int key, string value){
         int hashValue = hashFunction(key);
 
+        //tạo mới node
         Node* newNode = new Node();
         newNode->data.key = key;
         newNode->data.value = value;
         newNode->next = nullptr;
 
+        //nếu index trống
         if(table[hashValue] == NULL){
             table[hashValue] = newNode;
         }else{
-            newNode->next = table[hashValue];
-            table[hashValue] = newNode;
+            /*idea hashTable được tạo thành từ một array, mỗi index trong
+            arry là bucket. trong mỗi bucket là một chuỗi linkedlist, điều này
+            giúp cho tránh bị conllision trong hash, nghĩa là quá nhiều kết quả
+            hash ra cùng một key*/
+
         }
+    }
+    void removeItem(int key){
+        int a = hashFunction(key);
+
     }
 };
