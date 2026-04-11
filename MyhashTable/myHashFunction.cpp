@@ -113,6 +113,7 @@ class MyhashTable {
             }
         }
     }
+
     void removeItem(int key) {
         int hashValue = hashFunction(key);
 
@@ -132,7 +133,7 @@ class MyhashTable {
             prev = current;
             current = current->next;
         }
-
+        cout << "Invalid key in hashmap" << endl;
     }
 
     Item searchTable(int key) {
@@ -163,7 +164,6 @@ class MyhashTable {
                     << ", " << current->data.value << ") ";
                 current = current->next;
             }
-
             cout << endl;
         }
     }
