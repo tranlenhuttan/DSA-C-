@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 using namespace std;
+template <typename Item>
 
 class MyhashTable {
     private:
@@ -26,7 +27,7 @@ class MyhashTable {
         int hashFunction(int key);
         void insertItem(int key, string value);
         void removeItem(int key);
-        string searchTable(int key);
+        auto searchTable(int key);
         void printTable();
 
 
@@ -49,28 +50,121 @@ class MyhashTable {
         return key % hashGroups;
     };
 
+    /*Gọi insertItem (key, value)
+            │
+            ▼
+    hashValue = key % 10
+            │
+            ▼
+    ┌─────────────────────────────┐
+    │  table[hashValue] == NULL?  │
+    └─────────────────────────────┘
+        YES │              NO │
+            ▼                 ▼
+    Chèn thẳng        Duyệt linked list
+    newNode vào           tại hashValue
+    bucket                    │
+                        ┌────────┴────────┐
+                        ▼                 ▼
+                Tìm thấy node      Không tìm thấy
+                trùng KEY?         node trùng key
+                        │                 │
+            ┌────────┴────────┐        ▼
+            ▼                 ▼    Chèn newNode
+            Trùng cả          Chỉ     vào cuối list
+            key+value?        trùng key
+            │                 │
+            ▼                 ▼
+            Bỏ qua,          Cập nhật
+            không làm gì     value mới
+    */
+   
     void insertItem(int key, string value){
         int hashValue = hashFunction(key);
 
-        //tạo mới node
+        // Tạo node mới
         Node* newNode = new Node();
         newNode->data.key = key;
         newNode->data.value = value;
         newNode->next = nullptr;
 
-        //nếu index trống
-        if(table[hashValue] == NULL){
+        Node *current = table[hashValue];
+
+        if(current == NULL){
             table[hashValue] = newNode;
         }else{
-            /*idea hashTable được tạo thành từ một array, mỗi index trong
-            arry là bucket. trong mỗi bucket là một chuỗi linkedlist, điều này
-            giúp cho tránh bị conllision trong hash, nghĩa là quá nhiều kết quả
-            hash ra cùng một key*/
+            for (; current != nullptr ;)
+            {
+                if(current->data.key == key){
+                    if(current->data.value == value){
+                        delete newNode;
+                        return;
+                    }
+                    current->data.value = value;
+                    delete newNode;
+                    return;
+                }
 
+                if (current->next == nullptr) {
+                    current->next = newNode;
+                    return;
+                }
+                current = current->next;
+            }
         }
     }
-    void removeItem(int key){
-        int a = hashFunction(key);
+    void removeItem(int key) {
+        int hashValue = hashFunction(key);
 
+        Node* current = table[hashValue];
+        Node* prev = nullptr;
+
+        while (current != nullptr) {
+            if (current->data.key == key) {
+                if (prev == nullptr) {
+                    table[hashValue] = current->next;
+                } else {
+                    prev->next = current->next;
+                }
+                delete current;
+                return;
+            }
+            prev = current;
+            current = current->next;
+        }
+
+    }
+
+    Item searchTable(int key) {
+        int hashValue = hashFunction(key);
+        Node* current = table[hashValue];
+
+        while (current != nullptr) {
+            if (current->data.key == key) {
+                return current->data.value; 
+            }
+            current = current->next;
+        }
+
+        cout << "Invalid key in hashmap" << endl;
+        return Item{};
+    }
+
+    void printTable() {
+        for (int i = 0; i < hashGroups; i++) {
+            Node* current = table[i];
+
+            if (current == nullptr) continue;
+
+            cout << "Bucket [" << i << "]: ";
+
+            while (current != nullptr) {
+                cout << "(" << current->data.key 
+                    << ", " << current->data.value << ") ";
+                current = current->next;
+            }
+
+            cout << endl;
+        }
     }
 };
